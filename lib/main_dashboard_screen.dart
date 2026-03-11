@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'expert_screen.dart';
+import 'chat_screen.dart';
 import 'settings_screen.dart';
 
 // ─────────────────────────────────────────────
@@ -19,6 +20,7 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     ExpertScreen(),
+    ChatScreen(),
     SettingsScreen(),
   ];
 
@@ -38,7 +40,7 @@ class _MainShellState extends State<MainShell> {
 }
 
 // ─────────────────────────────────────────────
-//  BOTTOM NAVIGATION BAR
+//  BOTTOM NAVIGATION BAR  (4 tabs)
 // ─────────────────────────────────────────────
 
 class _BottomNav extends StatelessWidget {
@@ -51,21 +53,38 @@ class _BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.92),
+        color: Colors.white.withOpacity(0.95),
         border: const Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, -2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, -2)),
         ],
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavItem(icon: Icons.home_rounded, label: 'Home', selected: currentIndex == 0, onTap: () => onTap(0)),
-              _NavItem(icon: Icons.support_agent_rounded, label: 'Expert', selected: currentIndex == 1, onTap: () => onTap(1)),
-              _NavItem(icon: Icons.settings_rounded, label: 'Settings', selected: currentIndex == 2, onTap: () => onTap(2)),
+              _NavItem(
+                  icon: Icons.home_rounded,
+                  label: 'Home',
+                  selected: currentIndex == 0,
+                  onTap: () => onTap(0)),
+              _NavItem(
+                  icon: Icons.support_agent_rounded,
+                  label: 'Expert',
+                  selected: currentIndex == 1,
+                  onTap: () => onTap(1)),
+              _ChatNavItem(
+                  selected: currentIndex == 2, onTap: () => onTap(2)),
+              _NavItem(
+                  icon: Icons.settings_rounded,
+                  label: 'Settings',
+                  selected: currentIndex == 3,
+                  onTap: () => onTap(3)),
             ],
           ),
         ),
@@ -74,17 +93,23 @@ class _BottomNav extends StatelessWidget {
   }
 }
 
+// Standard nav tab
 class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool selected;
   final VoidCallback onTap;
 
-  const _NavItem({required this.icon, required this.label, required this.selected, required this.onTap});
+  const _NavItem(
+      {required this.icon,
+      required this.label,
+      required this.selected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? const Color(0xFF2F7F34) : const Color(0xFF94A3B8);
+    final color =
+        selected ? const Color(0xFF2F7F34) : const Color(0xFF94A3B8);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -97,7 +122,52 @@ class _NavItem extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 10,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              fontWeight:
+                  selected ? FontWeight.w700 : FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Chat tab — highlighted bubble when selected
+class _ChatNavItem extends StatelessWidget {
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ChatNavItem({required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        selected ? const Color(0xFF2F7F34) : const Color(0xFF94A3B8);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          selected
+              ? Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2F7F34).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.chat_rounded,
+                      color: Color(0xFF2F7F34), size: 22),
+                )
+              : Icon(Icons.chat_rounded, color: color, size: 26),
+          const SizedBox(height: 3),
+          Text(
+            'Chat',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight:
+                  selected ? FontWeight.w700 : FontWeight.w500,
               color: color,
             ),
           ),
@@ -149,7 +219,6 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // ── Header ──
   Widget _buildHeader(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -162,7 +231,8 @@ class DashboardScreen extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
               const Icon(Icons.menu_rounded, color: Colors.white, size: 28),
@@ -185,7 +255,8 @@ class DashboardScreen extends StatelessWidget {
                   color: Colors.white.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
+                child: const Icon(Icons.notifications_outlined,
+                    color: Colors.white, size: 22),
               ),
             ],
           ),
@@ -194,7 +265,6 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // ── Hero Welcome Card ──
   Widget _buildHeroCard() {
     return Container(
       width: double.infinity,
@@ -216,44 +286,31 @@ class DashboardScreen extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Background decoration icon
           Positioned(
             right: -8,
             bottom: -8,
-            child: Icon(
-              Icons.nature_people_rounded,
-              size: 110,
-              color: Colors.white.withOpacity(0.10),
-            ),
+            child: Icon(Icons.nature_people_rounded,
+                size: 110, color: Colors.white.withOpacity(0.10)),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Welcome back,',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.80),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              Text('Welcome back,',
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.80),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500)),
               const SizedBox(height: 4),
-              const Text(
-                'Hello Farmer 🌱',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              const Text('Hello Farmer 🌱',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
-              Text(
-                'Your crops are looking healthy today.',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.90),
-                  fontSize: 13,
-                ),
-              ),
+              Text('Your crops are looking healthy today.',
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.90),
+                      fontSize: 13)),
             ],
           ),
         ],
@@ -261,7 +318,6 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // ── Scan Leaf Button ──
   Widget _buildScanLeafButton() {
     return Container(
       width: double.infinity,
@@ -296,25 +352,20 @@ class DashboardScreen extends StatelessWidget {
                     color: Colors.white.withOpacity(0.20),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.photo_camera_rounded, color: Colors.white, size: 38),
+                  child: const Icon(Icons.photo_camera_rounded,
+                      color: Colors.white, size: 38),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Scan Leaf',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                const Text('Scan Leaf',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700)),
                 const SizedBox(height: 4),
-                Text(
-                  'Instant disease detection & advice',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.70),
-                    fontSize: 13,
-                  ),
-                ),
+                Text('Instant disease detection & advice',
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(0.70),
+                        fontSize: 13)),
               ],
             ),
           ),
@@ -323,97 +374,116 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // ── Local Conditions ──
   Widget _buildLocalConditions() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           children: [
-            const Icon(Icons.cloud_rounded, color: _primaryGreen, size: 22),
-            const SizedBox(width: 8),
-            const Text(
-              'Local Conditions',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-            ),
+            Icon(Icons.cloud_rounded, color: _primaryGreen, size: 22),
+            SizedBox(width: 8),
+            Text('Local Conditions',
+                style:
+                    TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
           ],
         ),
         const SizedBox(height: 14),
         Row(
           children: [
-            Expanded(child: _WeatherCard(icon: Icons.thermostat_rounded, iconColor: _primaryGreen, label: 'Temp', value: '28°C', valueLarge: true)),
+            Expanded(
+                child: _WeatherCard(
+                    icon: Icons.thermostat_rounded,
+                    iconColor: _primaryGreen,
+                    label: 'Temp',
+                    value: '28°C',
+                    valueLarge: true)),
             const SizedBox(width: 10),
-            Expanded(child: _WeatherCard(icon: Icons.cloud_rounded, iconColor: const Color(0xFF94A3B8), label: 'Sky', value: 'Cloudy', valueLarge: false)),
+            Expanded(
+                child: _WeatherCard(
+                    icon: Icons.cloud_rounded,
+                    iconColor: const Color(0xFF94A3B8),
+                    label: 'Sky',
+                    value: 'Cloudy',
+                    valueLarge: false)),
             const SizedBox(width: 10),
-            Expanded(child: _WeatherCard(icon: Icons.water_drop_rounded, iconColor: _primaryGreen, label: 'Humidity', value: '60%', valueLarge: true)),
+            Expanded(
+                child: _WeatherCard(
+                    icon: Icons.water_drop_rounded,
+                    iconColor: _primaryGreen,
+                    label: 'Humidity',
+                    value: '60%',
+                    valueLarge: true)),
           ],
         ),
       ],
     );
   }
 
-  // ── Tips for Today ──
   Widget _buildTipsForToday() {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: _primaryGreen.withOpacity(0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _primaryGreen.withOpacity(0.30), width: 1),
+        border: Border.all(
+            color: _primaryGreen.withOpacity(0.30), width: 1),
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.lightbulb_rounded, color: _primaryGreen, size: 20),
+              Icon(Icons.lightbulb_rounded,
+                  color: _primaryGreen, size: 20),
               SizedBox(width: 8),
-              Text(
-                'Tips for Today',
-                style: TextStyle(
-                  color: _primaryGreen,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
-              ),
+              Text('Tips for Today',
+                  style: TextStyle(
+                      color: _primaryGreen,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15)),
             ],
           ),
-          const SizedBox(height: 10),
-          const Text(
+          SizedBox(height: 10),
+          Text(
             'Water plants early morning to prevent fungal growth. Keep an eye on potato leaves for dark spots after last night\'s rain.',
             style: TextStyle(
-              color: Color(0xFF334155),
-              fontSize: 13,
-              height: 1.6,
-            ),
+                color: Color(0xFF334155), fontSize: 13, height: 1.6),
           ),
         ],
       ),
     );
   }
 
-  // ── Common Diseases ──
   Widget _buildCommonDiseases() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           children: [
-            const Icon(Icons.grid_view_rounded, color: _primaryGreen, size: 22),
-            const SizedBox(width: 8),
-            const Text(
-              'Common Diseases',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-            ),
+            Icon(Icons.grid_view_rounded,
+                color: _primaryGreen, size: 22),
+            SizedBox(width: 8),
+            Text('Common Diseases',
+                style:
+                    TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _DiseaseItem(icon: Icons.yard_rounded, iconColor: Colors.red.shade600, label: 'Tomato'),
-            _DiseaseItem(icon: Icons.agriculture_rounded, iconColor: Colors.amber.shade700, label: 'Potato'),
-            _DiseaseItem(icon: Icons.eco_rounded, iconColor: Colors.green.shade700, label: 'Pepper'),
+            _DiseaseItem(
+                icon: Icons.yard_rounded,
+                iconColor: Colors.red.shade600,
+                label: 'Tomato'),
+            _DiseaseItem(
+                icon: Icons.agriculture_rounded,
+                iconColor: Colors.amber.shade700,
+                label: 'Potato'),
+            _DiseaseItem(
+                icon: Icons.eco_rounded,
+                iconColor: Colors.green.shade700,
+                label: 'Pepper'),
           ],
         ),
       ],
@@ -443,28 +513,35 @@ class _WeatherCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      padding:
+          const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2F7F34).withOpacity(0.18), width: 1),
+        border: Border.all(
+            color: const Color(0xFF2F7F34).withOpacity(0.18),
+            width: 1),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
         children: [
           Icon(icon, color: iconColor, size: 18),
           const SizedBox(height: 6),
-          Text(
-            label,
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
-          ),
+          Text(label,
+              style: const TextStyle(
+                  color: Color(0xFF94A3B8), fontSize: 11)),
           const SizedBox(height: 4),
           Text(
             value,
             style: TextStyle(
-              color: valueLarge ? const Color(0xFF2F7F34) : const Color(0xFF1E293B),
+              color: valueLarge
+                  ? const Color(0xFF2F7F34)
+                  : const Color(0xFF1E293B),
               fontSize: valueLarge ? 18 : 13,
               fontWeight: FontWeight.w700,
             ),
@@ -480,7 +557,10 @@ class _DiseaseItem extends StatelessWidget {
   final Color iconColor;
   final String label;
 
-  const _DiseaseItem({required this.icon, required this.iconColor, required this.label});
+  const _DiseaseItem(
+      {required this.icon,
+      required this.iconColor,
+      required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -492,18 +572,22 @@ class _DiseaseItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFF2F7F34).withOpacity(0.18), width: 1),
+            border: Border.all(
+                color: const Color(0xFF2F7F34).withOpacity(0.18),
+                width: 1),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2)),
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2)),
             ],
           ),
           child: Icon(icon, color: iconColor, size: 30),
         ),
         const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-        ),
+        Text(label,
+            style: const TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w500)),
       ],
     );
   }
